@@ -100,122 +100,28 @@
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        
-        // 1. Считывание строк и заполнение массива
-        System.out.print("Введите количество строк N: ");
-        int N = scanner.nextInt();
-        scanner.nextLine(); // Очистка буфера
-        
-        String[] strings = new String[N];
-        for (int i = 0; i < N; i++) {
-            System.out.print("Введите строку " + (i + 1) + ": ");
-            strings[i] = scanner.nextLine();
-        }
-        
-        // 2. Сортировка строк
-        for (int i = 0; i < N - 1; i++) {
-            for (int j = 0; j < N - i - 1; j++) {
-                if (compareStrings(strings[j], strings[j + 1]) > 0) {
-                    String temp = strings[j];
-                    strings[j] = strings[j + 1];
-                    strings[j + 1] = temp;
-                }
-            }
-        }
-        
-        System.out.println("\nОтсортированные строки:");
-        for (int i = 0; i < N; i++) {
-            System.out.println(strings[i]);
-        }
-        
-        // 3. Поиск самой часто встречающейся буквы
-        int[] charCount = new int[65536]; // Увеличиваем размер массива для Unicode символов
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < strings[i].length(); j++) {
-                char c = Character.toLowerCase(strings[i].charAt(j));
-                if (Character.isLetter(c)) {
-                    charCount[c]++;
-                }
-            }
-        }
-        
-        int maxCount = 0;
-        for (int i = 0; i < 65536; i++) {
-            if (charCount[i] > maxCount) {
-                maxCount = charCount[i];
-            }
-        }
-        
-        System.out.println("\nСамые часто встречающиеся буквы:");
-        for (int i = 0; i < 65536; i++) {
-            if (charCount[i] == maxCount && Character.isLetter((char)i)) {
-                System.out.print((char)i + " ");
-            }
-        }
-        System.out.println();
-        
-        // 4. Поиск и вывод палиндромов
-        int palindromeCount = 0;
-        System.out.println("\nПалиндромы:");
-        for (int i = 0; i < N; i++) {
-            if (isPalindrome(strings[i])) {
-                System.out.println(strings[i]);
-                palindromeCount++;
-            }
-        }
-        System.out.println("Количество палиндромов: " + palindromeCount);
-        
-        // 5. Соединение строк и подсчет слов
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < N; i++) {
-            result.append(strings[i]);
-            if (i < N - 1 && !endsWithPunctuation(strings[i])) {
-                result.append(", ");
-            }
-        }
-        
-        String finalString = result.toString();
-        int wordCount = countWords(finalString);
-        
-        System.out.println("\nИтоговая строка:");
-        System.out.println(finalString);
-        System.out.println("Количество слов в итоговой строке: " + wordCount);
-    }
-    
     private static int compareStrings(String s1, String s2) {
         int wordCount1 = countWords(s1);
         int wordCount2 = countWords(s2);
-        
+
         if (wordCount1 != wordCount2) {
             return wordCount1 - wordCount2;
         }
-        
+
         int vowelCount1 = countVowels(s1);
         int vowelCount2 = countVowels(s2);
-        
+
         if (vowelCount1 != vowelCount2) {
             return vowelCount1 - vowelCount2;
         }
-        
+
         return s1.length() - s2.length();
     }
-    
+
     private static int countWords(String s) {
-        int count = 0;
-        boolean inWord = false;
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isWhitespace(s.charAt(i))) {
-                inWord = false;
-            } else if (!inWord) {
-                inWord = true;
-                count++;
-            }
-        }
-        return count;
+        return s.trim().split("\\s+").length;
     }
-    
+
     private static int countVowels(String s) {
         int count = 0;
         String vowels = "aeiouаеёиоуыэюя";
@@ -226,28 +132,109 @@ public class Main {
         }
         return count;
     }
-    
-    private static boolean isPalindrome(String s) {
-        StringBuilder cleaned = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isLetterOrDigit(s.charAt(i))) {
-                cleaned.append(Character.toLowerCase(s.charAt(i)));
-            }
-        }
-        String cleanedStr = cleaned.toString();
-        for (int i = 0; i < cleanedStr.length() / 2; i++) {
-            if (cleanedStr.charAt(i) != cleanedStr.charAt(cleanedStr.length() - 1 - i)) {
+
+    private static boolean isPalindrome(String word) {
+        String cleaned = word.replaceAll("[^a-zA-Zа-яА-Я0-9]", "").toLowerCase();
+        int length = cleaned.length();
+        for (int i = 0; i < length / 2; i++) {
+            if (cleaned.charAt(i) != cleaned.charAt(length - 1 - i)) {
                 return false;
             }
         }
-        return true;
+        return length > 1; // Палиндром должен содержать хотя бы 2 символа
     }
-    
+
     private static boolean endsWithPunctuation(String s) {
         if (s.length() == 0) {
             return false;
         }
         char lastChar = s.charAt(s.length() - 1);
         return lastChar == '.' || lastChar == '!' || lastChar == '?';
+    }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // 1. Считывание строк и заполнение массива
+        System.out.print("Введите количество строк N: ");
+        int N = scanner.nextInt();
+        scanner.nextLine(); // Очистка буфера
+
+        String[] strings = new String[N];
+        for (int i = 0; i < N; i++) {
+            System.out.print("Введите строку " + (i + 1) + ": ");
+            strings[i] = scanner.nextLine();
+        }
+
+        // 2. Сортировка строк
+        for (int i = 0; i < N - 1; i++) {
+            for (int j = 0; j < N - i - 1; j++) {
+                if (compareStrings(strings[j], strings[j + 1]) > 0) {
+                    String temp = strings[j];
+                    strings[j] = strings[j + 1];
+                    strings[j + 1] = temp;
+                }
+            }
+        }
+
+        System.out.println("\nОтсортированные строки:");
+        for (int i = 0; i < N; i++) {
+            System.out.println(strings[i]);
+        }
+
+        // 3. Поиск самой часто встречающейся буквы
+        int[] charCount = new int[65536]; // Увеличиваем размер массива для Unicode символов
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < strings[i].length(); j++) {
+                char c = Character.toLowerCase(strings[i].charAt(j));
+                if (Character.isLetter(c)) {
+                    charCount[c]++;
+                }
+            }
+        }
+
+        int maxCount = 0;
+        for (int i = 0; i < 65536; i++) {
+            if (charCount[i] > maxCount) {
+                maxCount = charCount[i];
+            }
+        }
+
+        System.out.println("\nСамые часто встречающиеся буквы:");
+        for (int i = 0; i < 65536; i++) {
+            if (charCount[i] == maxCount && Character.isLetter((char)i)) {
+                System.out.print((char)i + " ");
+            }
+        }
+        System.out.println();
+
+        // 4. Поиск и вывод палиндромов
+        int totalPalindromeCount = 0;
+        System.out.println("\nПалиндромы:");
+        for (int i = 0; i < N; i++) {
+            String[] words = strings[i].split("\\s+");
+            for (String word : words) {
+                if (isPalindrome(word)) {
+                    System.out.println(word);
+                    totalPalindromeCount++;
+                }
+            }
+        }
+        System.out.println("Количество палиндромов: " + totalPalindromeCount);
+
+        // 5. Соединение строк и подсчет слов
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < N; i++) {
+            result.append(strings[i]);
+            if (i < N - 1 && !endsWithPunctuation(strings[i])) {
+                result.append(", ");
+            }
+        }
+
+        String finalString = result.toString();
+        int wordCount = countWords(finalString);
+
+        System.out.println("\nИтоговая строка:");
+        System.out.println(finalString);
+        System.out.println("Количество слов в итоговой строке: " + wordCount);
     }
 }
